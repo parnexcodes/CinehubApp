@@ -1,17 +1,22 @@
 import { View, Text, StyleSheet, Image, FlatList, SafeAreaView, TouchableOpacity } from 'react-native'
 import React, {useState, useEffect} from 'react'
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import axios from 'axios';
 import {TMDB_API} from "@env"
 
 export default function Movie({navigation}) {
 
     const [data, setData] = useState({ nowPlaying: null, topRatedMovies: null, upcomingMovies: null });
+    const [loading, setLoading] = useState(true)
     const apiKey = TMDB_API
     const apiReq = async () => {
         const respNowPlaying = await axios(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`);
         const respTopRatedMovies = await axios(`https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&language=en-US`);
         const respUpcomingMovies = await axios(`https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&language=en-US`);
         setData({nowPlaying: respNowPlaying.data.results, topRatedMovies: respTopRatedMovies.data.results, upcomingMovies: respUpcomingMovies.data.results})
+        if (loading) {
+          setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -24,6 +29,40 @@ export default function Movie({navigation}) {
         style={{height: 50 ,width: '100%', resizeMode: 'contain', marginTop: 15}}
         source={require('../assets/img/cinehub-apk.png')}
       />
+      {loading ? 
+    <SkeletonPlaceholder
+    backgroundColor={'#18181B'}
+    highlightColor={'gray'}>
+    <View style={{marginTop: 50}}>
+    </View>
+    <View style={{flexDirection: 'row', marginLeft: 20, marginTop: 20}}>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    </View>
+    <View style={{marginTop: 50}}>
+    </View>
+    <View style={{flexDirection: 'row', marginLeft: 20, marginTop: 20}}>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    </View>
+    <View style={{marginTop: 50}}>
+    </View>
+    <View style={{flexDirection: 'row', marginLeft: 20, marginTop: 20}}>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    <View style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}></View>
+    </View>
+</SkeletonPlaceholder>      
+    :
+    <View>
       <Text style={{fontSize: 20, color: '#f4f4f5', marginTop: 30, marginLeft: 20, fontWeight: 'bold'}}>Now 
       <Text style={{color: '#7DD329'}}> Playing</Text>
       </Text>
@@ -129,6 +168,8 @@ export default function Movie({navigation}) {
         keyExtractor={item => item.id}
       />
       </View>
+      </View>
+}
     </SafeAreaView>
   )
 }

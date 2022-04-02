@@ -53,7 +53,7 @@ function HomeScreen() {
           <Icon name="tv-outline" color={color} size={30} />
         ),
       }}
-    />             
+    />
   </Tab.Navigator>
   );
 }
