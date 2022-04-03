@@ -27,3 +27,11 @@ jobs:
         with:
           name: app-release.apk
           path: android/app/build/outputs/apk/release/
+      - name: Upload Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "release"
+          title: "Release Build"
+          files: |
+            android/app/build/outputs/apk/release/*.apk
