@@ -31,7 +31,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "release"
-          title: "Release Build"
+          title: "Cinehub APK Build"
+          prerelease: false
           files: |
             android/app/build/outputs/apk/release/*.apk
