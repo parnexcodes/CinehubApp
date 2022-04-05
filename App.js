@@ -7,8 +7,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Movie from './screens/Movie';
 import TV from './screens/TV';
 import Movieid from './screens/Movieid';
-import TVid from './screens/TVid';
 import SimilarMovieid from './screens/SimilarMovieid';
+import TVid from './screens/TVid';
+import SimilarTVid from './screens/SimilarTVid';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -67,8 +68,9 @@ const App = () => {
       }}>
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="Movieid" component={Movieid} />
-        <Stack.Screen name="TVid" component={TVid} />
         <Stack.Screen name="SimilarMovieid" component={SimilarMovieid} />
+        <Stack.Screen name="TVid" component={TVid} />
+        <Stack.Screen name="SimilarTVid" component={SimilarTVid} />
       </Stack.Navigator>
     </NavigationContainer>
   );

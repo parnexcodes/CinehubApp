@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import {TMDB_API} from "@env"
 
-const TVid = ({route, navigation}) => {
+const SimilarTVid = ({route, navigation}) => {
     const {id, name, poster_path, backdrop_path, overview, first_air_date, vote_average} = route.params
 
     const [data, setData] = useState({ tvDetails: null, similarTV: null });
@@ -63,7 +63,7 @@ const TVid = ({route, navigation}) => {
                 return (
                     <TouchableOpacity
                     onPress={() => {
-                    navigation.navigate('SimilarTVid', {
+                    navigation.navigate('TVid', {
                         id: element.item.id,
                         name: element.item.name,
                         poster_path: `https://image.tmdb.org/t/p/w500${element.item.poster_path}`,
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
     }
   })
 
-export default TVid
+export default SimilarTVid
