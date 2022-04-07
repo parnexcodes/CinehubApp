@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, ImageBackground, SafeAreaView, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ImageBackground, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import {TMDB_API} from "@env"
@@ -6,20 +6,24 @@ import {TMDB_API} from "@env"
 const TVid = ({route, navigation}) => {
     const {id, name, poster_path, backdrop_path, overview, first_air_date, vote_average} = route.params
 
-    const [data, setData] = useState({ tvDetails: null, similarTV: null });
+    const [data, setData] = useState({ tvDetails: null, similarTV: null, castCrew: null });
     const apiKey = TMDB_API
     const apiReq = async () => {
-        const resp = await axios(`https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=en-US`);
-        const similarResp = await axios(`https://api.themoviedb.org/3/tv/${id}/similar?api_key=${apiKey}&language=en-US`);
-        setData({ tvDetails: resp.data, similarTV: similarResp.data.results })
+        const [resp, similarResp, castCrew] = await Promise.all([
+            axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=en-US`),
+            axios.get(`https://api.themoviedb.org/3/tv/${id}/similar?api_key=${apiKey}&language=en-US`),
+            axios.get(`https://api.themoviedb.org/3/tv/${id}/credits?api_key=${apiKey}&language=en-US`)
+        ])
+        setData({ tvDetails: resp.data, similarTV: similarResp.data.results, castCrew: castCrew.data.cast })
     }
 
     useEffect(() => {
         apiReq();
-    }, []);
+    }, [id]);
 
   return (
-    <SafeAreaView style={styles.mainBg}>
+    <ScrollView style={styles.mainBg}
+    showsVerticalScrollIndicator={false}>
         <View>
         <ImageBackground
             style={{width: '100%', height: 240, resizeMode: 'cover', position: 'absolute'}}
@@ -46,8 +50,41 @@ const TVid = ({route, navigation}) => {
             <Text>★ {Number(vote_average).toFixed(1)} | {first_air_date}</Text>
         </View>
         <View style={{paddingTop: 10, marginLeft: 25, marginRight: 25}}>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{overview}</Text>
+            <Text style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{overview}</Text>
         </View>
+        <View style={{marginTop: 20, marginBottom: 10}}>
+            <Text style={{fontSize: 20, color: '#7DD329', marginLeft: 20, fontWeight: 'bold'}}>Cast</Text>
+        </View>
+        <View>
+        <FlatList
+            showsHorizontalScrollIndicator={false}
+            style={{marginTop: 10, marginLeft: 20}}
+            data={data.castCrew}
+            horizontal
+            renderItem={(element) => {
+                return (
+                    <TouchableOpacity
+                    onPress={() => {
+                    navigation.navigate('TVid', {
+                        id: element.item.id,
+                        cast_id: element.item.cast_id,
+                        name: element.item.name,
+                        profile_path: `https://image.tmdb.org/t/p/w500${element.item.profile_path}`,
+                        credit_id: element.item.credit_id
+                    });
+                    }}>
+                    <Image
+                        style={{width: 120, height: 180, resizeMode: 'cover', borderRadius: 5, marginRight: 8}}
+                        source={{
+                            uri: `https://image.tmdb.org/t/p/w500${element.item.profile_path}`,
+                        }}
+                    />
+                    </TouchableOpacity>
+                )
+            }}
+            keyExtractor={item => item.id}
+        />
+      </View>        
         <View style={{marginTop: 30, marginBottom: 10}}>
             <Text style={{fontSize: 20, color: '#f4f4f5', marginLeft: 20, fontWeight: 'bold'}}>Similar 
             <Text style={{color: '#7DD329'}}> Shows</Text>
@@ -63,7 +100,7 @@ const TVid = ({route, navigation}) => {
                 return (
                     <TouchableOpacity
                     onPress={() => {
-                    navigation.navigate('SimilarTVid', {
+                    navigation.navigate('TVid', {
                         id: element.item.id,
                         name: element.item.name,
                         poster_path: `https://image.tmdb.org/t/p/w500${element.item.poster_path}`,
@@ -85,7 +122,7 @@ const TVid = ({route, navigation}) => {
             keyExtractor={item => item.id}
         />
       </View>        
-    </SafeAreaView>
+    </ScrollView>
   )
 }
 
