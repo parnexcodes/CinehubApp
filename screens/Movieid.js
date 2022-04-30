@@ -11,7 +11,7 @@ const Movieid = ({route, navigation}) => {
     const apiReq = async () => {
         const [resp, similarResp, castCrew] = await Promise.all([
             axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=en-US`),
-            axios.get(`https://api.themoviedb.org/3/movie/${id}/similar?api_key=${apiKey}&language=en-US`),
+            axios.get(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${apiKey}&language=en-US`),
             axios.get(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${apiKey}&language=en-US`)
         ])
         setData({ movieDetails: resp.data, similarMovies: similarResp.data.results, castCrew: castCrew.data.cast })
@@ -86,11 +86,11 @@ const Movieid = ({route, navigation}) => {
         />
       </View>
         <View style={{marginTop: 30, marginBottom: 10}}>
-            <Text style={{fontSize: 20, color: '#f4f4f5', marginLeft: 20, fontWeight: 'bold'}}>Similar 
+            <Text style={{fontSize: 20, color: '#f4f4f5', marginLeft: 20, fontWeight: 'bold'}}>Recommended 
             <Text style={{color: '#7DD329'}}> Movies</Text>
             </Text>
         </View>
-        <View>
+        <View style={{paddingBottom: 20}}>
         <FlatList
             showsHorizontalScrollIndicator={false}
             style={{marginTop: 10, marginLeft: 20}}
