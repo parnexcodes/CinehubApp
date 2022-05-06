@@ -1,25 +1,28 @@
 import { View, Text, StyleSheet, Image, ImageBackground, ScrollView, FlatList, TouchableOpacity } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import axios from 'axios'
 import {TMDB_API} from "@env"
 
 const Movieid = ({route, navigation}) => {
-    const {id, title, poster_path, backdrop_path, overview, release_date, vote_average} = route.params
+    const {id, release_date} = route.params
 
-    const [data, setData] = useState({ movieDetails: null, similarMovies: null, castCrew: null });
+    const [data, setData] = useState({ movieDetails: [], similarMovies: [], castCrew: [] });
     const apiKey = TMDB_API
-    const apiReq = async () => {
+    const apiReq = useCallback(async () => {
         const [resp, similarResp, castCrew] = await Promise.all([
             axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=en-US`),
             axios.get(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${apiKey}&language=en-US`),
             axios.get(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${apiKey}&language=en-US`)
         ])
         setData({ movieDetails: resp.data, similarMovies: similarResp.data.results, castCrew: castCrew.data.cast })
-    }
+    }, [id, apiKey])
 
     useEffect(() => {
         apiReq();
-    }, [id]);
+    }, [apiReq]);
+
+    let hours = Math.trunc(data.movieDetails.runtime/60);
+    let minutes = data.movieDetails.runtime % 60;   
 
   return (
     <ScrollView style={styles.mainBg}
@@ -29,28 +32,28 @@ const Movieid = ({route, navigation}) => {
             style={{width: '100%', height: 240, resizeMode: 'cover', position: 'absolute'}}
             imageStyle={{ opacity: 0.4}}
             source={{
-                uri: backdrop_path,
+                uri: `https://image.tmdb.org/t/p/w500${data.movieDetails.backdrop_path}`,
             }}
         />
         <View style={{paddingTop: 180}}>
         <Image
             style={{width: 150, height: 200, resizeMode: 'cover', position: 'relative', alignSelf: 'center', borderRadius: 5}}
             source={{
-                uri: poster_path,
+                uri: `https://image.tmdb.org/t/p/w500${data.movieDetails.poster_path}`,
             }}
         /> 
         </View>                 
         </View>
         <View style={{alignSelf: 'center', paddingTop: 20}}>
-            <Text style={{fontSize: 22, fontWeight: 'bold'}}>{title} 
+            <Text style={{fontSize: 22, fontWeight: 'bold'}}>{data.movieDetails.title} 
             <Text style={{fontWeight: 'normal'}}> ({release_date.substr(0,4)})</Text>
             </Text>
         </View>
         <View style={{alignSelf: 'center', paddingTop: 5, paddingBottom: 10}}>
-            <Text>★ {Number(vote_average).toFixed(1)} | {release_date}</Text>
+            <Text>★ {Number(data.movieDetails.vote_average).toFixed(1)} | {data.movieDetails.release_date} | {`${hours} hr ${minutes} min`}</Text>
         </View>
         <View style={{paddingTop: 10, marginLeft: 25, marginRight: 25}}>
-            <Text style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{overview}</Text>
+            <Text style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{data.movieDetails.overview}</Text>
         </View>
         <View style={{marginTop: 20, marginBottom: 10}}>
             <Text style={{fontSize: 20, color: '#7DD329', marginLeft: 20, fontWeight: 'bold'}}>Cast</Text>

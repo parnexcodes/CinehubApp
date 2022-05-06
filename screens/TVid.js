@@ -1,25 +1,25 @@
 import { View, Text, StyleSheet, Image, ImageBackground, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import axios from 'axios'
 import {TMDB_API} from "@env"
 
 const TVid = ({route, navigation}) => {
-    const {id, name, poster_path, backdrop_path, overview, first_air_date, vote_average} = route.params
+    const {id, first_air_date} = route.params
 
-    const [data, setData] = useState({ tvDetails: null, similarTV: null, castCrew: null });
+    const [data, setData] = useState({ tvDetails: [], similarTV: [], castCrew: [] });
     const apiKey = TMDB_API
-    const apiReq = async () => {
+    const apiReq = useCallback(async () => {
         const [resp, similarResp, castCrew] = await Promise.all([
             axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${apiKey}&language=en-US`),
-            axios.get(`https://api.themoviedb.org/3/tv/${id}/similar?api_key=${apiKey}&language=en-US`),
+            axios.get(`https://api.themoviedb.org/3/tv/${id}/recommendations?api_key=${apiKey}&language=en-US`),
             axios.get(`https://api.themoviedb.org/3/tv/${id}/credits?api_key=${apiKey}&language=en-US`)
         ])
         setData({ tvDetails: resp.data, similarTV: similarResp.data.results, castCrew: castCrew.data.cast })
-    }
+    }, [id, apiKey])
 
     useEffect(() => {
         apiReq();
-    }, [id]);
+    }, [apiReq]);
 
   return (
     <ScrollView style={styles.mainBg}
@@ -29,28 +29,28 @@ const TVid = ({route, navigation}) => {
             style={{width: '100%', height: 240, resizeMode: 'cover', position: 'absolute'}}
             imageStyle={{ opacity: 0.4}}
             source={{
-                uri: backdrop_path,
+                uri: `https://image.tmdb.org/t/p/w500${data.tvDetails.backdrop_path}`,
             }}
         />
         <View style={{paddingTop: 180}}>
         <Image
             style={{width: 150, height: 200, resizeMode: 'cover', position: 'relative', alignSelf: 'center', borderRadius: 5}}
             source={{
-                uri: poster_path,
+                uri: `https://image.tmdb.org/t/p/w500${data.tvDetails.poster_path}`,
             }}
         /> 
         </View>                 
         </View>
         <View style={{alignSelf: 'center', paddingTop: 20}}>
-            <Text style={{fontSize: 22, fontWeight: 'bold'}}>{name} 
+            <Text style={{fontSize: 22, fontWeight: 'bold'}}>{data.tvDetails.name} 
             <Text style={{fontWeight: 'normal'}}> ({first_air_date.substr(0,4)})</Text>
             </Text>
         </View>
         <View style={{alignSelf: 'center', paddingTop: 5, paddingBottom: 10}}>
-            <Text>★ {Number(vote_average).toFixed(1)} | {first_air_date}</Text>
+            <Text>★ {Number(data.tvDetails.vote_average).toFixed(1)} | {data.tvDetails.first_air_date}</Text>
         </View>
         <View style={{paddingTop: 10, marginLeft: 25, marginRight: 25}}>
-            <Text style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{overview}</Text>
+            <Text style={{backgroundColor: 'rgba(55, 65, 81, 0.3)', padding: 10, borderRadius: 5}}>{data.tvDetails.overview}</Text>
         </View>
         <View style={{marginTop: 20, marginBottom: 10}}>
             <Text style={{fontSize: 20, color: '#7DD329', marginLeft: 20, fontWeight: 'bold'}}>Cast</Text>
@@ -86,11 +86,11 @@ const TVid = ({route, navigation}) => {
         />
       </View>        
         <View style={{marginTop: 30, marginBottom: 10}}>
-            <Text style={{fontSize: 20, color: '#f4f4f5', marginLeft: 20, fontWeight: 'bold'}}>Similar 
+            <Text style={{fontSize: 20, color: '#f4f4f5', marginLeft: 20, fontWeight: 'bold'}}>Recommended 
             <Text style={{color: '#7DD329'}}> Shows</Text>
             </Text>
         </View>
-        <View>
+        <View style={{paddingBottom: 20}}>
         <FlatList
             showsHorizontalScrollIndicator={false}
             style={{marginTop: 20, marginLeft: 20}}

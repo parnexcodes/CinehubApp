@@ -78,12 +78,7 @@ export default function TV({navigation}) {
             onPress={() => {
               navigation.navigate('TVid', {
                 id: element.item.id,
-                name: element.item.name,
-                poster_path: `https://image.tmdb.org/t/p/w500${element.item.poster_path}`,
-                backdrop_path: `https://image.tmdb.org/t/p/w500${element.item.backdrop_path}`,
-                overview: element.item.overview,
                 first_air_date: element.item.first_air_date,
-                vote_average: element.item.vote_average
               });
             }}>
             <Image

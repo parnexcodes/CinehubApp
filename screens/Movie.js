@@ -78,12 +78,7 @@ export default function Movie({navigation}) {
                 onPress={() => {
                   navigation.navigate('Movieid', {
                     id: element.item.id,
-                    title: element.item.title,
-                    poster_path: `https://image.tmdb.org/t/p/w500${element.item.poster_path}`,
-                    backdrop_path: `https://image.tmdb.org/t/p/w500${element.item.backdrop_path}`,
-                    overview: element.item.overview,
                     release_date: element.item.release_date,
-                    vote_average: element.item.vote_average
                   });
                 }}>
                 <Image
